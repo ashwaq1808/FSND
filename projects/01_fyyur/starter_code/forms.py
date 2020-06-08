@@ -233,7 +233,7 @@ class ArtistForm(Form):
         'website', validators=[URL()]
     )
     seeking_venue = SelectField(
-    'seeking_venue', choices=[
+        'seeking_venue', choices=[
         (True, 'Yes'),
         (False, 'No')
     ]
