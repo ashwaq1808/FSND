@@ -148,14 +148,16 @@ def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
+  search_term = request.form.get("search_term")
+  venues_names = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%'))
+  count = []
+  for name in venues_names:
+    count.append(name.name)
+    response={
+    "count": len(count),
+    "data": venues_names,
   }
+
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
@@ -265,14 +267,16 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
+  search_term = request.form.get("search_term")
+  artists_names = db.session.query(Artist).filter(Artist.name.ilike(f'%{search_term}%'))
+  count = []
+  for name in artists_names:
+    count.append(name.name)
+    response={
+    "count": len(count),
+    "data": artists_names,
   }
+  
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
@@ -418,23 +422,20 @@ def create_artist_submission():
 
 @app.route('/shows')
 def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data = []
-  shows = db.session.query(Show.artist_id, Show.venue_id, Show.start_time)
-  for show in shows:
-    artist =db.session.query(Artist.name,Artist.image_link).filter(Artist.id == show[0])
-    venue=db.session.query(Venue.name).filter(Venue.id == show[1])
-    data.append({
-      "venue_id": show[1],
-      "venue_name": venue,
-      "artist_id": show[0],
-      "artist_name": artist,
-      "start_time": str(show[2])
-    })
-
-  return render_template('pages/shows.html', shows=data)
+    data = []
+    shows = Show.query.order_by(Show.start_time.desc()).all()
+    for show in shows:
+        venue = Venue.query.filter_by(id=show.venue_id).first_or_404()
+        artist = Artist.query.filter_by(id=show.artist_id).first_or_404()
+        data.extend([{
+            "venue_id": venue.id,
+            "venue_name": venue.name,
+            "artist_id": artist.id,
+            "artist_name": artist.name,
+            "artist_image_link": artist.image_link,
+            "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+        }])
+    return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
 def create_shows():
