@@ -140,11 +140,11 @@ def search_question():
             abort(400)
         search = "%{}%".format(searchTerm)
         questions = Question.query.all()
-        questions_found = Question.query.filter(
-            Question.question.ilike(search))
-            questions_found_format = [
-            question.format() for question in questions_found]
+        questions_found = Question.query.filter(Question.question.ilike(search))
+        questions_found_format = [
+          question.format() for question in questions_found]
         return jsonify({
+            "success": True,
             "total_questions": len(questions),
             "questions": questions_found_format,
             "current_category": None
