@@ -42,3 +42,33 @@ The `./frontend` directory contains a complete React frontend to consume the dat
 Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. 
 
 [View the README.md within ./frontend for more details.](./frontend/README.md)
+
+
+
+API Documentation:
+
+/categories
+
+this endpoint return all available categories.
+
+/questions
+
+this endpoint return total questions and ten questions per page and pagination
+
+/questions/<int:id>
+
+this endpoint to DELETE question using a question ID.
+
+/search/questions
+
+this endpoint to get questions based on a search term.
+
+/categories/<int:category_id>/questions
+
+this endpoint to get questions based on category.
+
+/quizzes
+
+this endpoint to get questions to play the quiz.
+
+
