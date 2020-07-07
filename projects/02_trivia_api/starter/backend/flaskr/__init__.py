@@ -85,15 +85,15 @@ def create_app(test_config=None):
   @app.route('/questions/<int:id>', methods=["DELETE"])
   def delete_specific_question(id):
     try:
-      Question.query.filter(Question.id == id).delete()
-      db.session.commit()
-
-      return jsonify({
-        "success": True
-      })
-
+      question_deleted = Question.query.get(question_id)
+      question_deleted.delete()
     except:
       abort(500)
+
+      return jsonify({
+        'success':True,
+        'deleted_question_id': question_id
+      })
   '''
   @TODO:
   Create an endpoint to POST a new question,
