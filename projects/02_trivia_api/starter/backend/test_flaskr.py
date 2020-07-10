@@ -37,40 +37,41 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/categories')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(data), Category.query.count())
-        
+        self.assertTrue(len(data['categories']))
+
     def test_get_questions(self):
+        total_questions = Question.query.count()
         res = self.client().get('/questions')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['questions'])
-        self.assertEqual(data['total_questions'])
-        self.assertEqual(data['categories'])
+        self.assertEqual(total_questions,data['total_questions'])
+        self.assertTrue(len(data['categories']))
         self.assertEqual(0,data['current_category'])
 
     def test_delete_specific_question(self):
-        res = self.client().get('/questions/1')
+        res = self.client().delete('/questions/1')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
 
     def test_create_question(self):
-        res = self.client().get('/questions')
+        res = self.client().post('/questions')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
 
     def test_search_question(self):
-        res = self.client().get('/search/questions')
+        res = self.client().get('/search/questions',  json={'searchTerm': 'abc'})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['questions'])
-        self.assertEqual(data['total_questions'])
+        self.assertEqual(len(data['questions']),0)
+        self.assertEqual(data['total_questions'],0)
         self.assertEqual(data['current_category'])
 
     def test_search_question_without_match(self):
-        res = self.client().post('/questions', json={'searchTerm': 'No match'})
+        res = self.client().post('/search/questions', json={'searchTerm': 'No match'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -83,12 +84,12 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/categories/1/questions')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['questions'])
+        self.assertEqual(len(data['questions']),0)
         self.assertEqual(data['total_questions'])
 
 
     def test_play_quizzes(self):
-        res = self.client().get('/categories/1/questions')
+        res = self.client().post('/quizzes')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
