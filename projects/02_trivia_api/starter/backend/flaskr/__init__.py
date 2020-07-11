@@ -17,9 +17,6 @@ def create_app(test_config=None):
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-  @app.route('/')
-  def index():
-    return jsonify({'messege': 'hello'})
 
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
@@ -191,13 +188,13 @@ def create_app(test_config=None):
         previous_questions = []
         quiz_category = {}
       else:
-        previous_questions = content.get('previous_questions', [])
-        quiz_category = content.get('quiz_category', {})
-        if 'id' in quiz_category:
-          query = query.filter(Question.category == quiz_category['id'])
-          question = query.filter(
-            Question.id.notin_(previous_questions)
-            ).order_by(func.random()).first()
+        previous_questions = content.get('previous_questions')
+        quiz_category = content.get('quiz_category')
+        qusetions = Question.query.all()
+        category = Question.query.filter_by(category=quiz_category['id']).all()
+        question = query.filter(
+          Question.id.notin_(previous_questions)
+          ).order_by(func.random()).first()
 
       return jsonify({
         'success': True,
@@ -209,7 +206,8 @@ def create_app(test_config=None):
 
   '''
   @TODO:
-  Create error handlers for all expected errors
+  Create error handlers for all expected
+  errors
   including 404 and 422.
   '''
   @app.errorhandler(404)
